@@ -1,47 +1,97 @@
 # VAJRA-CV
 
-VAJRA-CV is a secure, air-gapped computer vision assurance platform designed to detect model poisoning, backdoor triggers, provenance issues, OOD drift, and deployment risk in edge ML systems.
+## Air-gapped AI assurance for models you can trust
 
-## Overview
+VAJRA-CV is a security-first computer-vision assurance platform for checking model integrity, poisoned features, backdoor risk, provenance, environmental drift, and edge inference commitments before deployment.
 
-The platform is structured as a security-first MLOps and assurance control plane for CV models. It provides:
+It combines a FastAPI control plane with a responsive React console built for local, air-gapped, and enterprise evaluation workflows.
 
-- poison detection using spectral anomaly analysis
-- trojan scanning using trigger inversion and MAD scoring
-- provenance ledger validation with hash chaining and signatures
-- OOD drift detection using free-energy logic
-- audit logging and signed model registry tracking
-- deployment-ready runtime configuration and container orchestration
+> **Demo status:** This repository includes deterministic fixtures so reviewers can see clean, flagged, rejected, healed, and tampered outcomes locally.
 
-## Production architecture
+## What It Checks
 
-### Runtime
-- Python backend with FastAPI
-- Docker and Docker Compose deployment
-- Prometheus and Grafana observability
-- Kubernetes manifest support
+| Area | Console section | Example result |
+| --- | --- | --- |
+| Feature poisoning | Poison scrubber | `SAFE` / `FLAGGED` |
+| Model backdoors | Trojan hunter | `CERTIFIED_CLEAN` / `FLAGGED_TROJAN` |
+| Memory integrity | ECC monitor | protected weight verification |
+| Environment shift | Self-healing | entropy improvement |
+| Provenance | Audit ledger | `INTACT` / `COMPROMISED` |
+| Frame commitments | Audit ledger | `COMMITMENT_RECORDED` |
 
-### Security
-- API key enforcement for protected routes
-- RBAC-style access control
-- signed model registry metadata
-- audit log trail for model actions
+## Product Flow
 
-## Local setup
+```text
+Landing page -> Sign in -> Command center -> Upload artifact -> Review verdict
+```
 
-1. Create a Python environment.
-2. Install dependencies:
-   `pip install -r requirements.txt`
-3. Start the API:
-   `python -m uvicorn engine.api_gateway:app --host 0.0.0.0 --port 8000`
-4. Run tests:
-   `pytest -q`
+The interface supports day mode and night mode, responsive navigation, a profile menu, desktop/tablet/phone layouts, and clear failure states.
 
-## Local demo fixtures
+## Quick Start
 
-Generate reproducible inputs for each assurance section:
+### 1. Install backend dependencies
+
+PowerShell:
 
 ```powershell
+Set-Location "C:\Users\YOUR_USER\vajra-cv"
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
+
+### 2. Start the backend
+
+Use local demo credentials only. Never use these values in production.
+
+```powershell
+Set-Location "C:\Users\YOUR_USER\vajra-cv"
+$env:VAJRA_API_KEY = "local-api-key"
+$env:VAJRA_MODEL_SECRET = "local-model-secret"
+$env:VAJRA_KMS_MASTER_SECRET = "local-kms-secret"
+$env:VAJRA_API_ROLE = "admin"
+$env:VAJRA_LEDGER_DB = "data/ledger_intact.db"
+$env:VAJRA_PROVENANCE_KEY_PATH = "data/ledger_intact.key"
+
+.\venv\Scripts\python.exe -m uvicorn engine.api_gateway:app --host 127.0.0.1 --port 8000
+```
+
+Health check:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/healthz
+```
+
+### 3. Start the frontend
+
+Open a second terminal:
+
+```powershell
+Set-Location "C:\Users\YOUR_USER\vajra-cv\ui"
+npm install
+npm run dev
+```
+
+Open `http://127.0.0.1:5173/`.
+
+## Demo Login
+
+The local demo login requires all three values:
+
+| Field | Demo value |
+| --- | --- |
+| Username / email | `admin@vajra.local` |
+| Password | Any password with 8 or more characters, for example `local-password` |
+| API key | `local-api-key` |
+
+The login screen is a local demo gate. Production deployments should connect it to an OIDC/SSO provider and inject API credentials through a secret manager.
+
+## Demo Fixtures
+
+Generate all local fixtures:
+
+```powershell
+Set-Location "C:\Users\YOUR_USER\vajra-cv"
 python tools/generate_feature_fixtures.py
 python tools/generate_trojan_fixtures.py
 python tools/generate_tta_fixtures.py
@@ -49,35 +99,116 @@ python tools/generate_frame_fixture.py
 python tools/generate_ledger_fixtures.py
 ```
 
-Expected demo outcomes:
+### Feature poisoning
 
-- `data/features_safe.npy`: `CLEAN`
-- `data/features_flagged.npy`: `COMPROMISED`
-- `models/model_safe.pth`: `CERTIFIED_CLEAN`
-- `models/model_flagged_trojan.pth`: `FLAGGED_TROJAN`
-- `data/tta_drifted.npy`: `SELF_HEALING_COMPLETE`
-- `data/ledger_intact.db`: `INTACT`
-- `data/ledger_tampered.db`: `COMPROMISED`
-- `data/sample_inference_frame.png`: `COMMITMENT_RECORDED`
+In **Poison scrubber**, upload:
 
-The commitment demo is intentionally labeled as a commitment. A production zk-SNARK/PLONK proving backend is not included.
-
-## Environment variables
-
-See [.env.example](.env.example) for sample values.
-
-## Docker
-
-```bash
-docker compose up --build
+```text
+data/features_safe.npy       -> CLEAN
+data/features_flagged.npy    -> COMPROMISED / flagged samples
+data/features_invalid.npy    -> HTTP 400 rejected safely
 ```
 
-## Kubernetes
+### Trojan Hunter
 
-```bash
-kubectl apply -f k8s/deployment.yaml
+In **Trojan hunter**, upload:
+
+```text
+models/model_safe.pth           -> CERTIFIED_CLEAN
+models/model_flagged_trojan.pth -> FLAGGED_TROJAN / class 2
 ```
 
-## Production readiness
+### Self-healing
 
-See [production_readiness.md](production_readiness.md).
+In **Self-healing**, upload:
+
+```text
+data/tta_nominal.npy
+data/tta_drifted.npy
+```
+
+The result reports `SELF_HEALING_COMPLETE`, initial entropy, final entropy, and adaptation improvement.
+
+### Audit ledger
+
+In **Audit ledger**, the intact fixture reports `INTACT`:
+
+```powershell
+$env:VAJRA_LEDGER_DB = "data/ledger_intact.db"
+$env:VAJRA_PROVENANCE_KEY_PATH = "data/ledger_intact.key"
+```
+
+The tampered fixture reports `COMPROMISED` at block 1:
+
+```powershell
+$env:VAJRA_LEDGER_DB = "data/ledger_tampered.db"
+$env:VAJRA_PROVENANCE_KEY_PATH = "data/ledger_tampered.key"
+```
+
+Restart the backend after changing either variable, then click the ledger refresh control.
+
+### Real frame commitment
+
+In **Audit ledger**, upload:
+
+```text
+data/sample_inference_frame.png
+```
+
+The current local implementation records a SHA-256-bound `COMMITMENT_RECORDED` result. It does not claim a real zk-SNARK/PLONK proof until a production proving backend is configured.
+
+## Testing
+
+Run the full backend suite:
+
+```powershell
+Set-Location "C:\Users\YOUR_USER\vajra-cv"
+$env:VAJRA_MODEL_SECRET = "test-model-secret"
+$env:VAJRA_KMS_MASTER_SECRET = "test-kms-secret"
+.\venv\Scripts\python.exe -m pytest -q
+```
+
+Run the section-level API tests:
+
+```powershell
+.\venv\Scripts\python.exe -m pytest tests/test_api_sections.py -q
+```
+
+Run the live API smoke test:
+
+```powershell
+.\venv\Scripts\python.exe tools/local_smoke_test.py --api-key local-api-key
+```
+
+Build the frontend:
+
+```powershell
+Set-Location "C:\Users\YOUR_USER\vajra-cv\ui"
+npm run build
+```
+
+## Security Notes
+
+- Protected API routes require `X-API-Key`.
+- API roles are server-authoritative through `VAJRA_API_ROLE`; client role headers do not elevate privileges.
+- PyTorch uploads use safe tensor-only deserialization and an allow-listed demo architecture.
+- Invalid feature uploads fail closed instead of falling back to demo data.
+- Signing secrets must be injected from a secret manager in production.
+- Keep the provenance private key and ledger database together across restarts.
+- Docker and Kubernetes deployment hardening is documented in [production_readiness.md](production_readiness.md).
+
+## Repository Layout
+
+```text
+core/       Detection and assurance modules
+engine/     API, auth, registry, signing, metrics, and runtime controls
+ui/         React/Vite product console and Tauri shell
+tools/      Reproducible local demo fixture generators and smoke tests
+tests/      Backend and API regression tests
+k8s/        Kubernetes deployment baseline
+monitoring/ Prometheus configuration
+```
+
+## License
+
+See the repository licensing terms before redistributing this project.
