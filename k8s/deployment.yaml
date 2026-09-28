@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vajra-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vajra-backend
+  template:
+    metadata:
+      labels:
+        app: vajra-backend
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: vajra-backend
+          image: vajra-backend:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: VAJRA_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vajra-secrets
+                  key: api-key
+            - name: VAJRA_MODEL_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: vajra-secrets
+                  key: model-secret
+            - name: VAJRA_API_ROLE
+              value: "operator"
+            - name: VAJRA_MODEL_REGISTRY
+              value: "/app/data/model_registry.json"
+            - name: VAJRA_AUDIT_LOG
+              value: "/app/logs/audit.jsonl"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: model-data
+              mountPath: /app/data
+            - name: audit-logs
+              mountPath: /app/logs
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: model-data
+          persistentVolumeClaim:
+            claimName: vajra-model-data
+        - name: audit-logs
+          persistentVolumeClaim:
+            claimName: vajra-audit-logs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vajra-backend
+spec:
+  selector:
+    app: vajra-backend
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vajra-model-data
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vajra-audit-logs
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi

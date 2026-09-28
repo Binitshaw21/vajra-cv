@@ -1,0 +1,8 @@
+{
+  "artifact": "trojan_model.pth",
+  "sha256": "e6cc2d28e2d27110bb7858bda98e45efb47c96df9b8ba867de9ff9dff4fdd507",
+  "signature_algorithm": "Ed25519",
+  "signed_message": "sha256 hex digest",
+  "signature_hex": "b89ca8c870f65a22d8b9d9fc15e0ef64eeab3ba13ffdb8de49aa9aa0cc1f958353c02cf52c5ca5905eba881140ecf8c34f68402d2205ccd5d1dfb51fa579580a",
+  "public_key_hex": "ff3dfe37fa07c3170b91597b951da2ebb398a0819e4ff52194b9608cf7d6238d"
+}

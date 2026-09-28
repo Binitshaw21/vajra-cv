@@ -1,0 +1,13 @@
+.git
+.gitignore
+venv
+ui/node_modules
+ui/dist
+__pycache__
+*.pyc
+.pytest_cache
+tests
+database/*.db
+logs
+certs/device_private.key
+*.npy

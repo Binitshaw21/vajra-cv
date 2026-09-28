@@ -1,0 +1,39 @@
+project:
+  name: VAJRA-CV
+  environment: production
+  version: 1.5.0
+  owner: platform-security
+  contact: ops@local.invalid
+
+security:
+  air_gap: true
+  require_signed_artifacts: false
+  max_model_bytes: 536870912
+  allowed_model_formats:
+    - .pth
+    - .pt
+    - .onnx
+
+ml:
+  poison:
+    multiplier: 1.5
+  trojan:
+    steps: 12
+    lr: 0.05
+  ood:
+    temperature: 1.0
+    threshold: -6.0
+
+runtime:
+  host: 127.0.0.1
+  port: 8000
+  cors:
+    allowed_origins:
+      - http://localhost:5173
+      - tauri://localhost
+      - "*"
+
+logging:
+  level: INFO
+  structured: true
+  retention_days: 30

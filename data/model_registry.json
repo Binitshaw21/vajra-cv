@@ -1,0 +1,34 @@
+{
+  "200d4400c3d1514b7a550dc9892fa8beef7b32d854ca5e8b099bbaab36e4c681": {
+    "filename": "clean_model.pth",
+    "owner": "admin",
+    "sha256": "200d4400c3d1514b7a550dc9892fa8beef7b32d854ca5e8b099bbaab36e4c681",
+    "signed_digest": "eedf35599afb1825681656252587ed81aeb614c619571309b3b9d55e18623659",
+    "size_bytes": 549829,
+    "tags": []
+  },
+  "8cfb4845f98139a9f5f6e2820d1897dd2167984e46b87e9e846a54867d1dd301": {
+    "filename": "model_safe.pth",
+    "owner": "admin",
+    "sha256": "8cfb4845f98139a9f5f6e2820d1897dd2167984e46b87e9e846a54867d1dd301",
+    "signed_digest": "6c0364e5b4909ece9c7cd6664928c5fc466605724c767ac13babd7e41ff1cdfa",
+    "size_bytes": 790267,
+    "tags": []
+  },
+  "e6cc2d28e2d27110bb7858bda98e45efb47c96df9b8ba867de9ff9dff4fdd507": {
+    "filename": "trojan_model.pth",
+    "owner": "admin",
+    "sha256": "e6cc2d28e2d27110bb7858bda98e45efb47c96df9b8ba867de9ff9dff4fdd507",
+    "signed_digest": "7a6030239f83d4ff29c1faec08fe45bdeccabf33b442e74dfb03a1b73971e976",
+    "size_bytes": 549843,
+    "tags": []
+  },
+  "f89740f374410e85542ecf188fbcca7644d189ce045d9a57fb2d787c8b60131c": {
+    "filename": "model_flagged_trojan.pth",
+    "owner": "admin",
+    "sha256": "f89740f374410e85542ecf188fbcca7644d189ce045d9a57fb2d787c8b60131c",
+    "signed_digest": "88ec620c84ea966c9dd86fa2abdbb3c9866d655d6404ebe988a0fdf731cd4331",
+    "size_bytes": 790431,
+    "tags": []
+  }
+}

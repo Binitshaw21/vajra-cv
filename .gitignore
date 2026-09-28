@@ -1,0 +1,13 @@
+venv/
+ui/node_modules/
+ui/dist/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.env
+.env.*
+logs/
+database/*.db
+data/test_artifact_registry.json
+certs/device_private.key
