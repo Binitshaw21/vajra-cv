@@ -44,7 +44,6 @@ RUN python tools/generate_tta_fixtures.py || true
 # Set default VAJRA environment variables
 ENV VAJRA_ENVIRONMENT="production" \
     VAJRA_REQUIRE_API_KEY="false" \
-    VAJRA_CORS_ORIGINS="*" \
     VAJRA_API_KEY="render-demo-key" \
     VAJRA_MODEL_SECRET="render-demo-secret" \
     PORT=8000
