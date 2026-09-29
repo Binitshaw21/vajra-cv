@@ -222,5 +222,11 @@ async def trigger_test_time_adaptation(ood_data: UploadFile | None = File(None),
     return result
 
 
+from fastapi.staticfiles import StaticFiles
+
+frontend_dir = os.path.join(os.path.dirname(__file__), "../ui/dist")
+if os.path.exists(frontend_dir):
+    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
+
 if __name__ == "__main__":
     uvicorn.run(app, host=settings.backend_host, port=settings.backend_port, log_level=settings.log_level.lower())
